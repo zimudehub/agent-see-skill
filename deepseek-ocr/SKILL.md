@@ -11,24 +11,59 @@ Extracts text and structured content from images and PDFs via DeepSeek-OCR throu
 
 - The active model cannot parse image attachments. Never claim to have seen the image directly; always route it through the script and treat the script output as the source of truth.
 - If the user's image is not accessible (missing path, unsupported type), report the exact error and ask for a valid local path or URL.
+- Before running, check the user's environment (Node.js >= 18 and Python 3). If a required tool is missing, show the install guidance in the "Environment" section below and wait for the user to confirm installation before continuing. Never silently skip the check.
 
 ## Workflow
 
-1. Resolve the input: a local absolute path (e.g. `/Users/admin/Desktop/shot.png`), an attached file path, or an `http(s)://` URL.
-2. Run the bundled script:
+1. Check the runtime environment with the bundled script:
+
+   ```bash
+   bash scripts/check-env.sh
+   ```
+
+   If it reports a missing or too-old tool, follow the install guidance it prints (also summarized in "Environment" below), wait for the user to confirm, then re-run the check. If the user already has the tools, skip this step.
+2. Resolve the input: a local absolute path (e.g. `/Users/admin/Desktop/shot.png`), an attached file path, or an `http(s)://` URL.
+3. Run the bundled script:
 
    ```bash
    node scripts/ocr.mjs --image <path-or-url> [--mode document|ocr|table|figure|describe] [--output out.md]
    ```
 
-3. Choose the mode to match the content:
+4. Choose the mode to match the content:
    - `document` – pages, screenshots, scans → Markdown with tables (default)
    - `table` – spreadsheets/tables → Markdown table
    - `figure` – charts/plots inside documents → detailed description
    - `describe` – general photos/UI screenshots → detailed description
    - `ocr` – verbatim text extraction without layout
-4. The script prints the extracted text/Markdown to stdout. Present it to the user; if they want a saved file, pass `--output`.
-5. On failure (missing key, network error, API error), show the error and the configuration steps below.
+5. The script prints the extracted text/Markdown to stdout. Present it to the user; if they want a saved file, pass `--output`.
+6. On failure (missing key, network error, API error), show the error and the configuration steps below.
+
+## Environment
+
+The skill needs two tools:
+
+- **Node.js >= 18** – required at runtime to run `scripts/ocr.mjs` (zero npm dependencies, uses built-in `fetch`).
+- **Python 3** – only required when installing the skill via skill-installer (`install-skill-from-github.py`); not needed at runtime.
+
+Quick manual check:
+
+```bash
+node --version      # need v18 or newer
+python3 --version   # need Python 3.x
+```
+
+Or run the automated check (prints per-OS install guidance if anything is missing):
+
+```bash
+bash scripts/check-env.sh
+```
+
+Install guidance if a tool is missing:
+
+- **macOS (Homebrew):** `brew install node`；Python 3：`xcode-select --install` 或 `brew install python@3`
+- **Linux (Debian/Ubuntu):** `sudo apt-get update && sudo apt-get install -y python3`，Node：`curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash - && sudo apt-get install -y nodejs`
+- **Linux (Fedora/RHEL):** `sudo dnf install -y python3 nodejs`
+- **Windows (winget, PowerShell):** `winget install Python.Python.3.12` 和 `winget install OpenJS.NodeJS.LTS`（或从 https://nodejs.org 与 https://www.python.org/downloads/ 下载安装包；PowerShell 里 Python 命令通常是 `python` 而非 `python3`）
 
 ## Configuration
 

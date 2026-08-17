@@ -16,6 +16,26 @@ agent-see-skill/
     └── agents/openai.yaml      # UI 元数据
 ```
 
+## 环境要求
+
+| 工具 | 版本 | 用途 |
+| --- | --- | --- |
+| Node.js | >= 18 | 运行 `scripts/ocr.mjs`（零依赖，用内置 fetch） |
+| Python 3 | 任意 3.x | 仅安装时使用（skill-installer 脚本），运行时不需要 |
+
+检测当前环境（会自动打印缺失工具的安装命令）：
+
+```bash
+bash deepseek-ocr/scripts/check-env.sh
+```
+
+缺失时的安装命令：
+
+- **macOS（Homebrew）：** `brew install node`；Python 3 用 `xcode-select --install` 或 `brew install python@3`
+- **Linux (Debian/Ubuntu)：** `sudo apt-get update && sudo apt-get install -y python3`；Node：`curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash - && sudo apt-get install -y nodejs`
+- **Linux (Fedora/RHEL)：** `sudo dnf install -y python3 nodejs`
+- **Windows（PowerShell，winget）：** `winget install Python.Python.3.12`、`winget install OpenJS.NodeJS.LTS`（或到 https://nodejs.org / https://www.python.org/downloads/ 下载安装包）
+
 ## 安装
 
 ### 方式 A：把仓库链接丢给 agent（推荐）
@@ -24,8 +44,9 @@ agent-see-skill/
 
 > 请帮我安装这个 skill：https://github.com/zimudehub/agent-see-skill
 > 1. 获取该仓库中的 `deepseek-ocr` 目录；
-> 2. 把它复制到本机 `~/.codex/skills/deepseek-ocr`；
-> 3. 检查 `~/.config/deepseek-ocr/key` 是否存在；如果不存在，引导我注册 SiliconFlow、创建我自己的 API key 并存进去。
+> 2. 先运行 `bash deepseek-ocr/scripts/check-env.sh` 检查我本机的 Node.js（>= 18）和 Python 3 环境，缺失时按脚本输出的命令引导我安装；
+> 3. 把它复制到本机 `~/.codex/skills/deepseek-ocr`；
+> 4. 检查 `~/.config/deepseek-ocr/key` 是否存在；如果不存在，引导我注册 SiliconFlow、创建我自己的 API key 并存进去。
 
 Codex 用户也可以直接使用官方 skill-installer：
 
@@ -72,6 +93,7 @@ chmod 600 ~/.config/deepseek-ocr/key
 ## 常见问题
 
 - **安装后不生效？** skill 在对话开始时加载，请新开一个对话再试。
+- **提示缺少 Node.js / Python？** 运行 `bash deepseek-ocr/scripts/check-env.sh` 查看本机缺失项和对应安装命令，装好后重新运行该脚本确认。
 - **报 `max_tokens ... exceeded`？** SiliconFlow 限制总序列长度 8192，脚本默认 `max_tokens=4096`，无需手动改。
 - **想用自己的 GPU 跑？** 部署 vLLM 后设置 `DEEPSEEK_OCR_BASE_URL` 指向本地服务，详见 `deepseek-ocr/references/backends.md`。
 - **如何卸载？** 删除 `~/.codex/skills/deepseek-ocr` 即可。
