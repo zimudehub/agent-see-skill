@@ -1,0 +1,4 @@
+interface:
+  display_name: "DeepSeek OCR"
+  short_description: "Read images/PDFs and convert to text or Markdown"
+  default_prompt: "Use $deepseek-ocr to read the image and tell me what it says."
